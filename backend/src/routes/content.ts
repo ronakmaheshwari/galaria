@@ -80,8 +80,8 @@ contentRouter.post(
 contentRouter.get('/',userMiddleware,async(req:any,res:any)=>{
   try{
       const userId = req.userId;
-      const page = req.query.page || 1;
-      const limit = req.query.limit || 10;
+      const page = parseInt(req.query.page as string) || 1;
+      const limit = parseInt(req.query.limit as string) || 10;
       const skip = (page-1)*limit
       const [total,data] = await Promise.all([
         prisma.content.count({
