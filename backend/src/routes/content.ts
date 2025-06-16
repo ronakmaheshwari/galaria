@@ -20,6 +20,7 @@ contentRouter.post(
   async (req: any, res: any) => {
     try {
       const userId = req.userId
+      // console.log('The userId is',userId);
       const files = req.files as Express.Multer.File[]
 
       const validation = filesZod.safeParse(files)
@@ -59,7 +60,9 @@ contentRouter.post(
             data: {
               url,
               type,
-              userId,
+              user: {
+                connect: { id: userId },
+              },
             },
           })
 

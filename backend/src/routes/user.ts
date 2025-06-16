@@ -35,7 +35,7 @@ userRouter.post('/signup',async(req:any,res:any)=>{
                 username,email,password:hash
             }
         })
-        const token = jwt.sign({id: newUser.id},jwtsecret)
+        const token = jwt.sign({ userId: newUser.id }, jwtsecret, {expiresIn: '1d'});  
         return res.status(200).json({
             message:"User Successfully Added",
             token:token
@@ -73,7 +73,7 @@ userRouter.post('/signin',async(req:any,res:any)=>{
                 message:"Invalid Password recieved"
             })
         }
-        const token = jwt.sign({userId: ExistingUser.id},jwtsecret);
+        const token = jwt.sign({userId: ExistingUser.id},jwtsecret, {expiresIn: '1d'});
         return res.status(200).json({
             message:"Logged in successfully",
             token:token
