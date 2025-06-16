@@ -62,6 +62,11 @@ shareRouter.post('/',userMiddleware,async(req:any,res:any)=>{
 shareRouter.get('/:shareLink',userMiddleware,async(req:any,res:any)=>{
     try {
         const hash  = req.params.shareLink
+
+        const page = parseInt(req.query.page as string) || 1;
+        const limit = parseInt(req.query.limit as string) || 10;
+        const skip = (page-1)*limit
+
         const response = await prisma.link.findFirst({
             where:{
                 hash:hash
@@ -75,8 +80,18 @@ shareRouter.get('/:shareLink',userMiddleware,async(req:any,res:any)=>{
         const content = await prisma.content.findMany({
             where:{
                 userId:response.userId
+            },
+            skip,
+            take:limit
+        })
+
+        const total = await prisma.content.count({
+            where:{
+                userId:response.userId
             }
         })
+
+        const totalPages = Math.ceil(total/limit);
         const userDetails = await prisma.user.findFirst({
             where:{
                 id:response.userId
@@ -87,6 +102,10 @@ shareRouter.get('/:shareLink',userMiddleware,async(req:any,res:any)=>{
         })
         return res.status(200).json({
             message:"Returned Successfully",
+            page,
+            limit,
+            total,
+            totalPages,
             userDetails,
             content
         })
