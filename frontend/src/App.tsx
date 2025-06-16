@@ -1,14 +1,21 @@
 import './App.css'
 import { Button } from './components/ui/button'
+import FileManagerPage from './FileManagerPage';
+import LandingPage from './LandingPage'
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import SignUp from './SignUp';
+import SignIn from './SignIn';
 
 function App() {
   return (
-    <div className='flex gap-2 min-h-svh flex-col items-center justify-center bg-zinc-50'>
-      <h1 className="font-bold underline text-5xl">
-        Hello world!, Run pnpm run dev 
-      </h1>
-      <Button>Click me</Button>
-    </div>
+   <Router>
+      <Routes>
+        <Route path="/" element={<LandingPage />} />
+        <Route path="/files" element={<FileManagerPage />} />
+         <Route path="/signup" element={<SignUp />} />
+           <Route path="/signin" element={<SignIn />} />
+      </Routes>
+    </Router>
   )
 }
 
