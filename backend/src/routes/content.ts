@@ -74,4 +74,65 @@ contentRouter.post(
   }
 )
 
+contentRouter.get('/',userMiddleware,async(req:any,res:any)=>{
+  try{
+      const userId = req.userId;
+      const page = req.query.page || 1;
+      const limit = req.query.limit || 10;
+      const skip = (page-1)*limit
+      const [total,data] = await Promise.all([
+        prisma.content.count({
+          where:{
+            userId:userId
+          }}
+        ),
+        prisma.content.findMany({
+          where:{
+            userId:userId
+          },
+          skip,
+          take:limit
+        })
+      ])
+      const totalPages = Math.ceil(total/limit);
+      return res.status(200).json({
+          success: true,
+          page,
+          limit,
+          total,
+          totalPages,
+          data
+      })
+  }catch(error){
+      console.error(error)
+      return res.status(500).json({ error: "Error at Content fetch" })
+  }
+})
+
+contentRouter.delete('/:id', userMiddleware, async(req: any, res:any) => {
+  try {
+    const userId = req.userId
+    const contentId = req.params.id
+
+    const existing = await prisma.content.findUnique({
+      where: { id: contentId },
+    })
+    if (!existing) {
+      return res.status(404).json({ error: 'Content not found' })
+    }
+    if (existing.userId !== userId) {
+      return res.status(403).json({ error: 'Unauthorized' })
+    }
+
+    await prisma.content.delete({
+      where: { id: contentId },
+    })
+
+    return res.status(200).json({ message: 'Content has been deleted' })
+  } catch (error) {
+    console.error(error)
+    return res.status(500).json({ error: 'Error deleting content' })
+  }
+})
+
 export default contentRouter

@@ -1,31 +1,34 @@
-import dotenv from 'dotenv';
-import { createClient } from '@supabase/supabase-js';
-dotenv.config();
+import dotenv from 'dotenv'
+import { createClient } from '@supabase/supabase-js'
 
-const SUPABASE_URL = process.env.SUPABASE_URL;
-const SUPABASE_KEY = process.env.SUPABASE_KEY;
+dotenv.config()
+
+const SUPABASE_URL = process.env.SUPABASE_URL
+const SUPABASE_KEY = process.env.SUPABASE_KEY
+const BUCKET = 'uploads'
 
 if (!SUPABASE_URL || !SUPABASE_KEY) {
-  throw new Error('Missing Supabase environment variables');
+  throw new Error('Missing Supabase environment variables')
 }
 
-const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+const supabase = createClient(SUPABASE_URL, SUPABASE_KEY)
 
 export default async function uploadToSupabase(
   key: string,
   body: Buffer,
-  contentType: string
-): Promise<string | null> {
-  const { data, error } = await supabase.storage.from('uploads').upload(key, body, {
+  contentType: string,
+  upsert = false
+): Promise<string> {
+  const { error } = await supabase.storage.from(BUCKET).upload(key, body, {
     contentType,
-    upsert: false,
-  });
+    upsert,
+  })
 
   if (error) {
-    console.error('Supabase upload error:', error.message);
-    return null;
+    console.error('Supabase upload error:', error.message)
+    throw new Error('Failed to upload to Supabase')
   }
 
-  const fileUrl = `${SUPABASE_URL}/storage/v1/object/public/uploads/${key}`;
-  return fileUrl;
+  return `${SUPABASE_URL}/storage/v1/object/public/${BUCKET}/${key}`
 }
+
