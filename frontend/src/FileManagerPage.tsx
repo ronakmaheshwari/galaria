@@ -1,5 +1,4 @@
-import React, { useState } from "react";
-import { Card } from "@/components/ui/card";
+import { useState } from "react";
 import {
   Pagination,
   PaginationContent,
@@ -7,15 +6,12 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
-  LayoutGrid,
-  FolderOpen,
-  UploadCloud,
   Download,
   Trash2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import Sidebar from "./components/ui/Sidebar";
 
 const imageFiles = Array.from({ length: 15 }, (_, i) => ({
   name: `Image ${i + 1}`,
@@ -24,11 +20,6 @@ const imageFiles = Array.from({ length: 15 }, (_, i) => ({
   src: `https://picsum.photos/300?random=${i + 1}`,
 }));
 
-const navLinks = [
-  { label: "Dashboard", icon: LayoutGrid },
-  { label: "My Files", icon: FolderOpen },
-  { label: "Uploads", icon: UploadCloud },
-];
 
 export default function FileManagerPage() {
   const [page, setPage] = useState(1);
@@ -43,25 +34,7 @@ export default function FileManagerPage() {
   return (
     <div className="flex min-h-screen bg-gray-50">
       {/* Sidebar */}
-      <aside className="w-64 bg-white shadow-md border-r">
-        <div className="px-6 py-6">
-          <h2 className="text-xl font-bold text-purple-600">Galeria</h2>
-        </div>
-        <nav className="space-y-2 px-4">
-          {navLinks.map((link, idx) => (
-            <div
-              key={idx}
-              className={cn(
-                "flex items-center gap-3 px-4 py-2 rounded-lg text-sm font-medium cursor-pointer text-gray-700 hover:bg-purple-100 hover:text-purple-700 transition",
-                link.label === "My Files" && "bg-purple-100 text-purple-700"
-              )}
-            >
-              <link.icon className="w-5 h-5" />
-              {link.label}
-            </div>
-          ))}
-        </nav>
-      </aside>
+      <Sidebar />
 
       {/* Main Content */}
       <main className="flex-1 p-8">
