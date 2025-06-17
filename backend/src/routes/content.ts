@@ -115,7 +115,7 @@ contentRouter.get('/',userMiddleware,async(req:any,res:any)=>{
 contentRouter.delete('/:id', userMiddleware, async(req: any, res:any) => {
   try {
     const userId = req.userId
-    const contentId = req.params.id
+    const contentId = parseInt(req.params.id as string);
 
     const existing = await prisma.content.findUnique({
       where: { id: contentId },
