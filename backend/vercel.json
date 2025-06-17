@@ -1,0 +1,5 @@
+{
+  "buildCommand": "pnpm install && pnpm approve-builds && pnpm build",
+  "outputDirectory": "dist",
+  "ignoreCommand": "echo ''"
+}
