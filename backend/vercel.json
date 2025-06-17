@@ -1,11 +1,12 @@
 {
-  "buildCommand": "pnpm install && pnpm approve-builds && pnpm build",
-  "outputDirectory": "dist",
-  "cleanUrls": true,
-  "rewrites": [
+  "version": 2,
+  "builds": [
     {
-      "source": "/api/(.*)",
-      "destination": "/api/index.js"
+      "src": "dist/index.js",
+      "use": "@vercel/node"
     }
-  ]
+  ],
+  "buildCommand": "pnpm install --no-frozen-lockfile && pnpm build",
+  "outputDirectory": "dist",
+  "ignoreCommand": "echo ''"
 }
