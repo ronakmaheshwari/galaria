@@ -1,6 +1,5 @@
-// src/components/SignUp.tsx
-
-import { useState, ChangeEvent, FormEvent } from "react";
+import { useState } from "react";
+import type { ChangeEvent, FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import toast from "react-hot-toast";
@@ -8,8 +7,11 @@ import { FcGoogle } from "react-icons/fc";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import axios from "axios";
+import { Backend_URL } from "./config";
 
 interface FormData {
+  username: string;
   email: string;
   password: string;
   confirmPassword: string;
@@ -23,6 +25,7 @@ const SignUp = () => {
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState<FormData>({
+    username: "",
     email: "",
     password: "",
     confirmPassword: "",
@@ -39,16 +42,17 @@ const SignUp = () => {
 
   const validate = (): FormErrors => {
     const newErrors: FormErrors = {};
+    if (!formData.username.trim()) newErrors.username = "Username is required";
     if (!formData.email.trim()) newErrors.email = "Email is required";
     if (!formData.password) newErrors.password = "Password is required";
     if (!formData.confirmPassword) newErrors.confirmPassword = "Confirm password is required";
-    if (formData.password && formData.confirmPassword && formData.password !== formData.confirmPassword) {
+    if (formData.password !== formData.confirmPassword) {
       newErrors.confirmPassword = "Passwords do not match";
     }
     return newErrors;
   };
 
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const validationErrors = validate();
     if (Object.keys(validationErrors).length > 0) {
@@ -56,12 +60,24 @@ const SignUp = () => {
       return;
     }
 
-    setIsLoading(true);
-    setTimeout(() => {
+    try {
+      setIsLoading(true);
+      const { username, email, password } = formData;
+
+      const response = await axios.post(`${Backend_URL}/user/signup`, {
+        username,
+        email,
+        password,
+      });
+      const token = response.data.token;
+      localStorage.setItem("token", token);
+      toast.success("Signup successful!");
+      navigate("/files");
+    } catch (error: any) {
+      toast.error(error?.response?.data?.message || "Signup failed. Try again.");
+    } finally {
       setIsLoading(false);
-      toast.success("Signup simulated successfully!");
-      // navigate("/dashboard");
-    }, 1500);
+    }
   };
 
   return (
@@ -96,6 +112,17 @@ const SignUp = () => {
           <form onSubmit={handleSubmit} className="space-y-5">
             <div>
               <Input
+                name="username"
+                type="text"
+                placeholder="Username"
+                value={formData.username}
+                onChange={handleChange}
+                className="border border-gray-300 focus:ring-2 focus:ring-violet-500"
+              />
+              {errors.username && <p className="text-red-500 text-sm mt-1">{errors.username}</p>}
+            </div>
+            <div>
+              <Input
                 name="email"
                 type="email"
                 placeholder="Email"
@@ -105,7 +132,6 @@ const SignUp = () => {
               />
               {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}
             </div>
-
             <div>
               <Input
                 name="password"
@@ -117,7 +143,6 @@ const SignUp = () => {
               />
               {errors.password && <p className="text-red-500 text-sm mt-1">{errors.password}</p>}
             </div>
-
             <div>
               <Input
                 name="confirmPassword"
@@ -152,6 +177,7 @@ const SignUp = () => {
               variant="outline"
               className="w-full flex items-center justify-center gap-2 border-gray-300 hover:bg-gray-100"
               onClick={() => toast.success("Google auth simulated")}
+              disabled
             >
               <FcGoogle size={20} />
               Continue with Google

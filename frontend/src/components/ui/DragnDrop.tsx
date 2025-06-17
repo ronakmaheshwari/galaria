@@ -12,7 +12,7 @@ export default function DragAndDrop() {
   const [files, setFiles] = useState<FilePreview[]>([]);
 
   const token =
-    "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTc1MDA5MzY4MSwiZXhwIjoxNzUwMTgwMDgxfQ.2kgvSi4EyMukzk1XsN-gFOEcWF2pq18l8tHKtlWrWjo"; // Replace with localStorage.getItem("token") in prod
+    "Bearer "+localStorage.getItem("token"); // Replace with localStorage.getItem("token") in prod
 
   const onDrop = (acceptedFiles: File[]) => {
     const filePreviews = acceptedFiles.map((file) => ({

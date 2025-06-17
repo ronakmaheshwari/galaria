@@ -9,6 +9,8 @@ import { FcGoogle } from "react-icons/fc";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import axios, { isAxiosError } from "axios";
+import { Backend_URL } from "./config"; // ✅ Ensure this path is correct
 
 interface FormData {
   email: string;
@@ -43,7 +45,7 @@ const SignIn = () => {
     return newErrors;
   };
 
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const validationErrors = validate();
     if (Object.keys(validationErrors).length > 0) {
@@ -51,12 +53,27 @@ const SignIn = () => {
       return;
     }
 
-    setIsLoading(true);
-    setTimeout(() => {
+    try {
+      setIsLoading(true);
+
+      const response = await axios.post(`${Backend_URL}/user/signin`, {
+        email: formData.email,
+        password: formData.password,
+      });
+
+      const token = response.data.token;
+      localStorage.setItem("token", token);
+      toast.success("Signed in successfully!");
+      navigate("/files");
+    } catch (error) {
+      if (isAxiosError(error)) {
+        toast.error(error.response?.data?.message || "Sign-in failed. Try again.");
+      } else {
+        toast.error("An unexpected error occurred.");
+      }
+    } finally {
       setIsLoading(false);
-      toast.success("Sign-in simulated successfully!");
-      // navigate("/dashboard");
-    }, 1500);
+    }
   };
 
   return (
@@ -97,6 +114,7 @@ const SignIn = () => {
                 value={formData.email}
                 onChange={handleChange}
                 className="border border-gray-300 focus:ring-2 focus:ring-violet-500"
+                required
               />
               {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}
             </div>
@@ -109,6 +127,7 @@ const SignIn = () => {
                 value={formData.password}
                 onChange={handleChange}
                 className="border border-gray-300 focus:ring-2 focus:ring-violet-500"
+                required
               />
               {errors.password && <p className="text-red-500 text-sm mt-1">{errors.password}</p>}
             </div>
@@ -135,6 +154,7 @@ const SignIn = () => {
               variant="outline"
               className="w-full flex items-center justify-center gap-2 border-gray-300 hover:bg-gray-100"
               onClick={() => toast.success("Google auth simulated")}
+              disabled
             >
               <FcGoogle size={20} />
               Continue with Google
