@@ -1,7 +1,0 @@
-{
-  "allowBuilds": [
-    "@prisma/client",
-    "prisma",
-    "bcrypt"
-  ]
-}
