@@ -1,5 +1,11 @@
 {
   "buildCommand": "pnpm install && pnpm approve-builds && pnpm build",
   "outputDirectory": "dist",
-  "ignoreCommand": "echo ''"
+  "cleanUrls": true,
+  "rewrites": [
+    {
+      "source": "/api/(.*)",
+      "destination": "/api/index.js"
+    }
+  ]
 }
