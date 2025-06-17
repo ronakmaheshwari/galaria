@@ -1,5 +1,6 @@
 import DragnDrop from "./components/ui/DragnDrop";
 import ContentHeader from "./components/ui/Header";
+import SharewithEmail from "./components/ui/ShareusingEmail";
 import Sidebar from "./components/ui/Sidebar";
 
 export default function Upload() {
@@ -11,10 +12,13 @@ export default function Upload() {
           <ContentHeader title="Upload Files" />
         </div>
 
-        <div className="flex-1 flex justify-center items-center p-6">
-          <div className="w-full max-w-2xl">
+        <div className="flex-1 overflow-y-auto p-6">
+          <div className="max-w-3xl mx-auto">
             <DragnDrop />
           </div>
+        </div>
+        <div className="flex-1 flex-col justify-center items-center bg-amber-300">
+            <SharewithEmail />
         </div>
       </div>
     </div>
