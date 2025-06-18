@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import heroImage from "@/assets/Hero.png";
 
+
 const navItems = [
     { label: "Features", href: "#features" },
     { label: "Use Cases", href: "#use-cases" },
@@ -15,8 +16,10 @@ const navItems = [
 
 const LandingPage = () => {
     return (
+
         <div className="font-sans min-h-screen bg-white text-gray-900 mx-auto">
             {/* Header */}
+            
             <header className="flex items-center justify-between px-6 md:px-10 py-6 shadow-sm ">
                 <div className="text-2xl font-extrabold text-purple-700">Galeria</div>
                 <nav className="hidden md:flex gap-6 text-gray-700 text-sm ">
@@ -45,7 +48,9 @@ const LandingPage = () => {
             </header>
 
             {/* Hero */}
+            
             <section className="px-6 md:px-12 py-16 text-center relative overflow-hidden">
+                
                 <h1 className="text-4xl md:text-6xl font-bold leading-tight">
                     Store and share your photos & videos
                     <br />
@@ -67,7 +72,7 @@ const LandingPage = () => {
                         </Button>
                     </a>
                 </div>
-
+           
                 {/* Illustrations */}
                 <div className="relative mt-16 flex justify-center">
                     <div className="relative w-full max-w-6xl">
