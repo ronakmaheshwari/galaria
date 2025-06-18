@@ -11,7 +11,7 @@ import {
   Trash2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import Sidebar from "./components/ui/Sidebar";
+import {Sidebar} from "./components/ui/Sidebar";
 
 const imageFiles = Array.from({ length: 15 }, (_, i) => ({
   name: `Image ${i + 1}`,

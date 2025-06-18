@@ -1,4 +1,6 @@
 import axios from "axios"
+import { useState } from "react"
+import { Backend_URL, Frontend_URL } from "@/config"
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
@@ -12,51 +14,70 @@ import {
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { useState } from "react"
-import { Backend_URL, Frontend_URL } from "@/config"
+import { Copy } from "lucide-react"
+import toast from "react-hot-toast"
 
 export function ShareButton() {
-const [sharelink, setSharelink] = useState<string>("");
+  const [sharelink, setSharelink] = useState<string>("")
 
-const handleShare = async()=>{
-    try{
-        const response = await axios.post(`${Backend_URL}/share`,{
-            share:true
-        },{
-            headers:{
-                Authorization:"Bearer "+localStorage.getItem("token")  //+localStorage.getItem("token")
-            }
-        })
-        const link = response.data.link
-        setSharelink(`${Frontend_URL}/share/${link}`);
-    }catch(error){
-        console.log(error);
+  const handleShare = async () => {
+    try {
+      const response = await axios.post(
+        `${Backend_URL}/share`,
+        { share: true },
+        {
+          headers: {
+            Authorization: "Bearer " + localStorage.getItem("token"),
+          },
+        }
+      )
+      const link = response.data.link
+      setSharelink(`${Frontend_URL}/share/${link}`)
+    } catch (error) {
+      console.error("Error sharing:", error)
+      toast.error("Failed to generate share link")
     }
-}
+  }
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(sharelink)
+    toast.success("Link copied to clipboard")
+  }
+
   return (
     <Dialog onOpenChange={(open) => open && handleShare()}>
       <DialogTrigger asChild>
-        <Button variant="outline" size="lg" className="bg-green-600 text-white">Share</Button>
+        <Button variant="outline" size="lg" className="bg-green-600 text-white">
+          Share
+        </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Share link</DialogTitle>
+          <DialogTitle>Share Link</DialogTitle>
           <DialogDescription>
-            Anyone who has this link will be able to view this.
+            Anyone with this link will be able to view your shared content.
           </DialogDescription>
         </DialogHeader>
-        <div className="flex items-center gap-2">
-          <div className="grid flex-1 gap-2">
-            <Label htmlFor="link" className="sr-only">
-              Link
-            </Label>
-            <Input
-              id="link"
-              defaultValue={sharelink}
-              readOnly
-            />
+
+        {sharelink && (
+          <div className="flex items-center gap-2">
+            <div className="grid flex-1 gap-2">
+              <Label htmlFor="link" className="sr-only">
+                Shareable Link
+              </Label>
+              <Input
+                id="link"
+                value={sharelink}
+                readOnly
+                onFocus={(e) => e.target.select()}
+              />
+            </div>
+            <Button type="button" variant="outline" onClick={handleCopy}>
+              <Copy className="w-4 h-4" />
+            </Button>
           </div>
-        </div>
+        )}
+
         <DialogFooter className="sm:justify-start">
           <DialogClose asChild>
             <Button type="button" variant="secondary">

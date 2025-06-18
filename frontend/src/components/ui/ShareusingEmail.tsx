@@ -1,96 +1,122 @@
-import { Backend_URL } from "@/config";
-import axios from "axios";
-import { useEffect, useState } from "react";
-import toast from "react-hot-toast";
+import { useEffect, useState } from "react"
+import { Mail, Send } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Backend_URL } from "@/config"
+import axios from "axios"
+import toast from "react-hot-toast"
 
 interface EmailSchema {
-  id: number;
-  email: string;
+  id: number
+  email: string
 }
 
-export default function SharewithEmail() {
-  const [emails, setEmails] = useState<EmailSchema[]>([]);
-  const [filter, setFilter] = useState<string>("");
-  const [sendingTo, setSendingTo] = useState<number | null>(null);
+export function SharewithEmail() {
+  const [suggestedEmails, setSuggestedEmails] = useState<EmailSchema[]>([])
+  const [filter, setFilter] = useState<string>("")
+  const [loading, setLoading] = useState<boolean>(false)
+  const [sendingTo, setSendingTo] = useState<number | null>(null)
 
   useEffect(() => {
-    async function fetchEmails() {
-      try {
-        const response = await axios.get(
-          `${Backend_URL}/share/email?filter=${filter}`,
-          {
+    const delayDebounce = setTimeout(() => {
+      async function fetchEmails() {
+        setLoading(true)
+        try {
+          const response = await axios.get(`${Backend_URL}/share/email`, {
+            params: { filter },
             headers: {
-              Authorization:
-                "Bearer "+localStorage.getItem("token"),
+              Authorization: "Bearer " + localStorage.getItem("token"),
             },
-          }
-        );
-        setEmails(response.data);
-      } catch (err) {
-        console.error("Failed to fetch emails:", err);
+          })
+          setSuggestedEmails(response.data || [])
+        } catch (err) {
+          console.error("Failed to fetch emails:", err)
+        } finally {
+          setLoading(false)
+        }
       }
-    }
 
-    fetchEmails();
-  }, [filter]);
+      fetchEmails()
+    }, 300)
 
-  const handleSend = async ( id: number) => {
+    return () => clearTimeout(delayDebounce)
+  }, [filter])
+
+  const handleSend = async (id: number) => {
     try {
-      setSendingTo(id);
-
+      setSendingTo(id)
       await axios.post(
         `${Backend_URL}/share/email`,
-        {shared:id},
+        { shared: id },
         {
           headers: {
-            Authorization:
-              "Bearer "+localStorage.getItem("token"),
+            Authorization: "Bearer " + localStorage.getItem("token"),
           },
         }
-      );
-      toast.success("Sent an email to your friend");
+      )
+      const sharedUser = suggestedEmails.find((u) => u.id === id)
+      toast.success(`Files shared with ${sharedUser?.email || "user"}`)
     } catch (err) {
-      alert("Failed to share");
+      console.error(err)
+      toast.error("Failed to share files")
     } finally {
-      setSendingTo(null);
+      setSendingTo(null)
     }
-  };
+  }
 
   return (
-    <div className="w-full h-full bg-white p-4">
-      <div className="flex flex-col items-center gap-4">
-        <div className="w-full rounded-md border-t border-dotted border-gray-300 py-3 px-4">
-          <h1 className="text-lg font-semibold text-gray-800">Share via Email</h1>
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <Mail className="h-5 w-5" />
+          Share via Email
+        </CardTitle>
+      </CardHeader>
+
+      <CardContent className="space-y-4">
+        <div className="space-y-2">
+          <Label htmlFor="search-email">Search Users</Label>
+          <Input
+            id="search-email"
+            placeholder="Search email..."
+            value={filter}
+            onChange={(e) => setFilter(e.target.value)}
+          />
         </div>
 
-        <input
-          type="email"
-          placeholder="Enter recipient email"
-          className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 w-full p-2.5"
-          value={filter}
-          onChange={(e) => setFilter(e.target.value)}
-        />
-
-        {emails.length > 0 && (
-          <div className="w-full max-h-64 overflow-y-auto border border-gray-200 rounded-md divide-y">
-            {emails.map((item) => (
-              <div
-                key={item.id}
-                className="flex items-center justify-between px-4 py-2 hover:bg-blue-50"
-              >
-                <span className="text-sm text-gray-800">{item.email}</span>
-                <button
-                  onClick={() => handleSend(item.id)}
-                  className="text-xs bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700 disabled:opacity-50"
-                  disabled={sendingTo === item.id}
+        <div className="space-y-2">
+          {loading ? (
+            <div className="text-gray-500">Loading users...</div>
+          ) : suggestedEmails.length === 0 ? (
+            <div className="text-gray-500">No users found.</div>
+          ) : (
+            <div className="border rounded-md max-h-64 overflow-y-auto divide-y">
+              {suggestedEmails.map((user) => (
+                <div
+                  key={user.id}
+                  className="flex items-center justify-between p-3 hover:bg-gray-50"
                 >
-                  {sendingTo === item.id ? "Sending..." : "Send"}
-                </button>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-    </div>
-  );
+                  <span className="text-sm text-gray-800">{user.email}</span>
+                  <Button
+                    size="sm"
+                    onClick={() => handleSend(user.id)}
+                    disabled={sendingTo === user.id}
+                  >
+                    {sendingTo === user.id ? "Sending..." : (
+                      <>
+                        <Send className="h-4 w-4 mr-1" />
+                        Share
+                      </>
+                    )}
+                  </Button>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </CardContent>
+    </Card>
+  )
 }
