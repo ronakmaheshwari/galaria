@@ -87,7 +87,7 @@ const SignUp = () => {
       const token = response.data.token;
       localStorage.setItem("token", token);
       toast.success("Signup successful!");
-      navigate("/files");
+      navigate("/otp");
     } catch (error) {
       if (isAxiosError(error)) {
         toast.error(

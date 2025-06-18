@@ -8,9 +8,6 @@
     "build": "pnpm prisma generate && tsc -b",
     "start": "node dist/index.js"
   },
-  "prisma": {
-    "schema": "src/lib/prisma/schema.prisma"
-  },
   "keywords": [],
   "author": "",
   "license": "ISC",

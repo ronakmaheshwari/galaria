@@ -74,7 +74,7 @@ const SignIn = () => {
       const token = response.data.token;
       localStorage.setItem("token", token);
       toast.success("Signed in successfully!");
-      navigate("/files");
+      navigate("/otp");
     } catch (error) {
       if (isAxiosError(error)) {
         toast.error(
