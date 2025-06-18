@@ -7,7 +7,7 @@ import { FcGoogle } from "react-icons/fc";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import axios from "axios";
+import axios, { isAxiosError } from "axios";
 import { Backend_URL } from "./config";
 
 interface FormData {
@@ -42,13 +42,27 @@ const SignUp = () => {
 
   const validate = (): FormErrors => {
     const newErrors: FormErrors = {};
+
     if (!formData.username.trim()) newErrors.username = "Username is required";
+
     if (!formData.email.trim()) newErrors.email = "Email is required";
-    if (!formData.password) newErrors.password = "Password is required";
-    if (!formData.confirmPassword) newErrors.confirmPassword = "Confirm password is required";
-    if (formData.password !== formData.confirmPassword) {
+
+    const passwordRegex =
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
+
+    if (!formData.password) {
+      newErrors.password = "Password is required";
+    } else if (!passwordRegex.test(formData.password)) {
+      newErrors.password =
+        "Password must be at least 8 characters and include uppercase, lowercase, number, and symbol";
+    }
+
+    if (!formData.confirmPassword) {
+      newErrors.confirmPassword = "Confirm password is required";
+    } else if (formData.password !== formData.confirmPassword) {
       newErrors.confirmPassword = "Passwords do not match";
     }
+
     return newErrors;
   };
 
@@ -69,12 +83,19 @@ const SignUp = () => {
         email,
         password,
       });
+
       const token = response.data.token;
       localStorage.setItem("token", token);
       toast.success("Signup successful!");
       navigate("/files");
-    } catch (error: any) {
-      toast.error(error?.response?.data?.message || "Signup failed. Try again.");
+    } catch (error) {
+      if (isAxiosError(error)) {
+        toast.error(
+          error.response?.data?.message || "Signup failed. Try again."
+        );
+      } else {
+        toast.error("An unexpected error occurred.");
+      }
     } finally {
       setIsLoading(false);
     }
@@ -108,7 +129,10 @@ const SignUp = () => {
           transition={{ delay: 0.4 }}
           className="bg-white p-10 rounded-2xl shadow-xl"
         >
-          <h2 className="text-3xl font-semibold mb-6 text-gray-800">Create your account</h2>
+          <h2 className="text-3xl font-semibold mb-6 text-gray-800">
+            Create your account
+          </h2>
+
           <form onSubmit={handleSubmit} className="space-y-5">
             <div>
               <Input
@@ -119,8 +143,11 @@ const SignUp = () => {
                 onChange={handleChange}
                 className="border border-gray-300 focus:ring-2 focus:ring-violet-500"
               />
-              {errors.username && <p className="text-red-500 text-sm mt-1">{errors.username}</p>}
+              {errors.username && (
+                <p className="text-red-500 text-sm mt-1">{errors.username}</p>
+              )}
             </div>
+
             <div>
               <Input
                 name="email"
@@ -130,8 +157,11 @@ const SignUp = () => {
                 onChange={handleChange}
                 className="border border-gray-300 focus:ring-2 focus:ring-violet-500"
               />
-              {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}
+              {errors.email && (
+                <p className="text-red-500 text-sm mt-1">{errors.email}</p>
+              )}
             </div>
+
             <div>
               <Input
                 name="password"
@@ -141,8 +171,11 @@ const SignUp = () => {
                 onChange={handleChange}
                 className="border border-gray-300 focus:ring-2 focus:ring-violet-500"
               />
-              {errors.password && <p className="text-red-500 text-sm mt-1">{errors.password}</p>}
+              {errors.password && (
+                <p className="text-red-500 text-sm mt-1">{errors.password}</p>
+              )}
             </div>
+
             <div>
               <Input
                 name="confirmPassword"
@@ -152,7 +185,11 @@ const SignUp = () => {
                 onChange={handleChange}
                 className="border border-gray-300 focus:ring-2 focus:ring-violet-500"
               />
-              {errors.confirmPassword && <p className="text-red-500 text-sm mt-1">{errors.confirmPassword}</p>}
+              {errors.confirmPassword && (
+                <p className="text-red-500 text-sm mt-1">
+                  {errors.confirmPassword}
+                </p>
+              )}
             </div>
 
             <Button
