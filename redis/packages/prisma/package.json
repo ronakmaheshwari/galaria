@@ -1,0 +1,26 @@
+{
+  "name": "@repo/prisma",
+  "version": "1.0.0",
+  "description": "",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tsc",
+    "generate": "prisma generate",
+    "dev": "tsc --watch",
+    "prepublishOnly": "pnpm build"
+  },
+  "exports": {
+    "./prisma": "./dist/index.js" 
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "devDependencies": {
+    "prisma": "^6.10.1"
+  },
+  "dependencies": {
+    "@prisma/client": "^6.10.1"
+  }
+}
