@@ -1,4 +1,4 @@
-# Galaria 🖼️📹
+## Galaria 🖼️📹
 
 **The media vault is built for performance, privacy, and seamless sharing.**
 Galaria is a modern web application that allows users to upload, compress, and securely share images and videos. It leverages cutting-edge technologies like Supabase/Cloudflare R2, OTP-based authentication, and smart media encoding to deliver a fast, efficient, and elegant experience.
@@ -13,6 +13,10 @@ One evening, while watching Linus Torvalds talk about building Git to manage his
 **"Why not build our own media storage platform — tailored to our needs?"**
 
 That’s how **Galaria** was born — a personal, high-performance media vault built to upload, optimize, store, and share content **without limits**.
+
+---
+## Approach
+![image](https://github.com/user-attachments/assets/feacdce3-eb93-48da-be51-b4718422f2f9)
 
 ---
 
