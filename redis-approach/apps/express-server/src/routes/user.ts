@@ -141,7 +141,7 @@ userRouter.post("/signin", async (req:any, res:any) => {
 userRouter.post("/otp", userMiddleware, async (req:any, res:any) => {
   try {
     const userId = req.userId;
-    const otpInput = parseInt(req.body.otp);
+    const otpInput = parseInt(req.body.otp as string);
 
     if (!userId || isNaN(otpInput)) {
       return res.status(400).json({ message: "Invalid userId or OTP format" });
