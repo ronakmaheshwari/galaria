@@ -13,9 +13,9 @@
   "license": "ISC",
   "type": "module",
   "dependencies": {
-    "@repo/redis":"*",
-    "@repo/zod":"*",
     "@repo/prisma": "*",
+    "@repo/redis": "*",
+    "@repo/zod": "*",
     "@types/bcrypt": "^5.0.2",
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.3",

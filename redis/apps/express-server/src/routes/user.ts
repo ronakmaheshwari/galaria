@@ -1,5 +1,5 @@
 import express from "express";
-import { PrismaClient } from "@prisma/client";
+import { prisma } from "@repo/prisma";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { SigninSchema, SignupSchema } from "@repo/zod/types";
@@ -11,7 +11,6 @@ import { userMiddleware } from "../middleware.js";
 dotenv.config();
 
 const userRouter = express.Router();
-const prisma = new PrismaClient();
 const saltrounds = Number(process.env.SALTRounds || 10);
 const jwtsecret = process.env.JWTSecret || "123456";
 const resend = new Resend(process.env.Resend_Key || "");

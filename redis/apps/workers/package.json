@@ -11,6 +11,8 @@
   "license": "ISC",
   "type": "module",
   "dependencies": {
+    "@repo/redis":"*",
+    "@repo/zod":"*",
     "@repo/prisma": "*"
   }
 }

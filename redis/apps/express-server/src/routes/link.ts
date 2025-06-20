@@ -1,70 +1,69 @@
 import express from "express"
-import { userMiddleware } from "../middleware"
-import z from 'zod'
-import prisma from "../lib/prisma/prisma"
-import RandomlinkGenerator from "../utils"
 import dotenv from "dotenv"
+import { userMiddleware } from "../middleware.js";
 import { Resend } from "resend";
+import { prisma } from "@repo/prisma";
+import { Shareschema } from "@repo/zod/types";
+import RandomlinkGenerator from "../utils.js";
 
-dotenv.config();
+dotenv.config()
 
-const shareRouter = express.Router()
-const Shareschema = z.object({
-    share:z.boolean()
-}) 
+const linkRouter = express.Router()
 const resend = new Resend(process.env.Resend_Key);
 
-shareRouter.post('/',userMiddleware,async(req:any,res:any)=>{
+linkRouter.post("/",userMiddleware,async(req:any,res:any)=>{
     try {
-        const share = Shareschema.safeParse(req.body);
-        if(!share.success){
+        const parsed = Shareschema.safeParse(req.body.share);
+        if(!parsed.success){
             return res.status(400).json({
-                message:"Invalid Inputs were provided",
-                error:share.error.flatten()
+                message:"Invalid Share Request was sent",
+                error:parsed.error.flatten()
             })
         }
+        const share = parsed.data.share
         if(share){
-        const userId = req.userId;
-        const ExistingHash = await prisma.link.findUnique({
-            where:{
-                userId:userId
-            }
-        })
-        if(ExistingHash){
-            return res.status(200).json({
-                link:ExistingHash.hash
-            })
-        }
-        const hash = RandomlinkGenerator(6);
-        if (typeof hash !== "string") {
-            return res.status(500).json({ error: "Failed to generate a valid hash" });
-        }
-        const newHash = await prisma.link.create({
-            data:{
-                userId:userId,
-                hash:hash
-            }
-        })
-        return res.status(200).json({
-                link:newHash.hash
-        })
-        }else{
-            await prisma.link.delete({
+            const userId = req.userId;
+            const ExistingHash = await prisma.link.findUnique({
                 where:{
-                    userId:req.userId
+                    userId
+                }
+            })
+            if(ExistingHash){
+                return res.status(200).json({
+                    link:ExistingHash.hash
+                })
+            }
+            const hash = RandomlinkGenerator(6);
+            if (typeof hash !== "string") {
+                return res.status(500).json({ error: "Failed to generate a valid hash" });
+            }
+            const newHash = await prisma.link.create({
+                data:{
+                    userId:userId,
+                    hash:hash
                 }
             })
             return res.status(200).json({
-                message:"Deleted Shared Link"
+                    link:newHash.hash
             })
+            }else{
+                await prisma.link.delete({
+                    where:{
+                        userId:req.userId
+                    }
+                })
+                return res.status(200).json({
+                    message:"Deleted the shared Link"
+                })
+            }
         }
-    } catch (error) {
+        catch(error) {
         console.error(error)
-        return res.status(500).json({ error: "Sharing Feature Failed" })
-    }
+            return res.status(500).json({ error: "Sharing Feature Failed" })
+        }
 })
 
-shareRouter.get('/email', userMiddleware, async (req: any, res: any) => {
+linkRouter.get('/email', userMiddleware, async (req: any, res: any) => {
   const userId = req.userId;
   const filter = req.query.filter as string || "";
 
@@ -121,7 +120,7 @@ const HTMLTemplate = (email: string, link: string) => `
   </div>
 `;
 
-shareRouter.post('/email', userMiddleware, async (req: any, res: any) => {
+linkRouter.post('/email', userMiddleware, async (req: any, res: any) => {
   try {
     const userId = req.userId;
     const { shared } = req.body;
@@ -177,7 +176,7 @@ shareRouter.post('/email', userMiddleware, async (req: any, res: any) => {
   }
 });
 
-shareRouter.get('/:shareLink',userMiddleware,async(req:any,res:any)=>{
+linkRouter.get('/:shareLink',userMiddleware,async(req:any,res:any)=>{
     try {
         const hash  = req.params.shareLink
         const page = parseInt(req.query.page as string) || 1;
@@ -232,4 +231,5 @@ shareRouter.get('/:shareLink',userMiddleware,async(req:any,res:any)=>{
     }
 })
 
-export default shareRouter
+
+export default linkRouter

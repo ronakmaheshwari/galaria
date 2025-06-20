@@ -34,3 +34,7 @@ export const fileZod = z.object({
 })
 
 export const filesZod = z.array(fileZod)
+
+export const Shareschema = z.object({
+  share:z.boolean()
+})
